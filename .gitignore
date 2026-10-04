@@ -51,3 +51,11 @@ android/java_pid*.hprof
 # Ensure build directories are ignored
 /android/app/build/
 **/build/
+
+# Keystores and sensitive signing properties
+key.properties
+android/key.properties
+*.jks
+*.keystore
+*.pem
+upload_certificate.pem
