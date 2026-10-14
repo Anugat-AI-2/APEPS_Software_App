@@ -10,18 +10,18 @@ class AppConfig {
   // URLs Configuration
   // ─────────────────────────────────────────────────────────────────────────────
 
-  /// Local Vite Dev Server URL
+  /// Local Vite Dev Server URL (PWA runs on port 5173)
   ///
   /// IMPORTANT FOR PHYSICAL ANDROID DEVICES (Connected via USB):
   /// Run this one-time command in your terminal so "localhost" on your phone
-  /// routes to your computer's Vite server:
+  /// routes to your computer's Vite and API servers:
   ///
-  ///   adb reverse tcp:5177 tcp:5177
-  ///   adb reverse tcp:8000 tcp:8000
+  ///   adb reverse tcp:5173 tcp:5173
+  ///   adb reverse tcp:3000 tcp:3000
   ///
   /// If you are using the Android Emulator (without adb reverse), you can use:
-  ///   "http://10.0.2.2:5177"
-  static const String devWebUrl = "http://localhost:5177";
+  ///   "http://10.0.2.2:5173"
+  static const String devWebUrl = "http://localhost:5173";
 
   /// Production Web URL
   static const String prodWebUrl = "https://hiralal.anugatai.com";
@@ -44,6 +44,7 @@ class AppConfig {
         host == '127.0.0.1' ||
         host.contains('anugatai.com') ||
         host.contains('hiralal.com') ||
+        url.contains('localhost:5173') ||
         url.contains('localhost:5177');
   }
 }

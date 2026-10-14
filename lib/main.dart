@@ -95,6 +95,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
           android: AndroidNotificationDetails(
             'high_importance_channel',
             'High Importance Notifications',
+            icon: '@drawable/ic_notification',
+            largeIcon: const DrawableResourceAndroidBitmap('ic_notification_large'),
+            color: const Color(0xFFF8D770),
             importance: Importance.max,
             priority: Priority.high,
             styleInformation: bigPictureStyleInformation,
@@ -397,6 +400,9 @@ class _WebViewPageState extends State<WebViewPage> {
                 android: AndroidNotificationDetails(
                   'high_importance_channel',
                   'High Importance Notifications',
+                  icon: '@drawable/ic_notification',
+                  largeIcon: const DrawableResourceAndroidBitmap('ic_notification_large'),
+                  color: const Color(0xFFF8D770),
                   importance: Importance.max,
                   priority: Priority.high,
                   styleInformation: bigPictureStyleInformation,
