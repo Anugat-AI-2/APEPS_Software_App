@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'app_config.dart';
 import 'services/app_review_service.dart';
 import 'services/app_update_service.dart';
@@ -220,6 +221,7 @@ class _WebViewPageState extends State<WebViewPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForAppUpdate();
+      _setupFCM();
     });
   }
 
@@ -313,20 +315,40 @@ class _WebViewPageState extends State<WebViewPage> {
   Future<void> _setupFCM() async {
     if (!Platform.isAndroid && !Platform.isIOS) return;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedToken = prefs.getString('fcm_token');
+      if (cachedToken != null && cachedToken.isNotEmpty) {
+        fcmToken = cachedToken;
+        debugPrint("📱 [FCM] Loaded cached token from local storage: $fcmToken");
+        _syncFCMToken();
+      }
+
+      if (Platform.isAndroid) {
+        await Permission.notification.request();
+      }
+
       FirebaseMessaging messaging = FirebaseMessaging.instance;
-      NotificationSettings settings = await messaging.requestPermission(alert: true, badge: true, sound: true);
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
       debugPrint("📱 [FCM] Notification authorization status: ${settings.authorizationStatus}");
 
       // Always fetch the FCM token regardless of authorization status
-      fcmToken = await messaging.getToken();
-      debugPrint("📱 [FCM] Native Token: $fcmToken");
-
-      // Sync token immediately to webview if already loaded
-      _syncFCMToken();
+      final liveToken = await messaging.getToken();
+      if (liveToken != null && liveToken.isNotEmpty) {
+        fcmToken = liveToken;
+        await prefs.setString('fcm_token', liveToken);
+        debugPrint("📱 [FCM] Native Token: $fcmToken");
+        _syncFCMToken();
+      }
 
       // Listen for live token refreshes from Firebase / Play Services
-      messaging.onTokenRefresh.listen((String newToken) {
+      messaging.onTokenRefresh.listen((String newToken) async {
         fcmToken = newToken;
+        await prefs.setString('fcm_token', newToken);
         debugPrint("🔄 [FCM] Token Refreshed: $newToken");
         _syncFCMToken();
       });
@@ -555,6 +577,25 @@ class _WebViewPageState extends State<WebViewPage> {
                     handlerName: 'getNativeFCMToken',
                     callback: (args) {
                       return fcmToken;
+                    },
+                  );
+                  controller.addJavaScriptHandler(
+                    handlerName: 'notifyUserLoggedIn',
+                    callback: (args) async {
+                      try {
+                        final prefs = await SharedPreferences.getInstance();
+                        if (args.isNotEmpty && args.first is Map) {
+                          final data = args.first as Map;
+                          final userId = data['userId']?.toString();
+                          final email = data['email']?.toString();
+                          if (userId != null) await prefs.setString('logged_in_user_id', userId);
+                          if (email != null) await prefs.setString('logged_in_email', email);
+                          debugPrint("📱 [Native Wrapper] User logged in sync: $email ($userId)");
+                        }
+                      } catch (e) {
+                        debugPrint("Error handling notifyUserLoggedIn: $e");
+                      }
+                      return {'success': true, 'fcmToken': fcmToken};
                     },
                   );
                   controller.addJavaScriptHandler(
