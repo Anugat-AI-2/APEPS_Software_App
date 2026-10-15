@@ -1,26 +1,36 @@
 {
   "project_info": {
-    "project_number": "50267464556",
-    "project_id": "apeps-mobile-68",
-    "storage_bucket": "apeps-mobile-68.firebasestorage.app"
+    "project_number": "932338031652",
+    "project_id": "master-diorama-509314-f8",
+    "storage_bucket": "master-diorama-509314-f8.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:50267464556:android:3f0b7f6b9384f214c40949",
+        "mobilesdk_app_id": "1:932338031652:android:89e01cc4d438b2cc778cb1",
         "android_client_info": {
           "package_name": "com.hiralal.apeps"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "932338031652-thce9n9bdld5leg4jricpcetm43405id.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyC4VOi1gmoqh5UGpIy735dAd_5SHXjTcaE"
+          "current_key": "AIzaSyDa-ykXLAeDaOZBTnXW_9Tuiekr7SeCwiM"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "932338031652-thce9n9bdld5leg4jricpcetm43405id.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
