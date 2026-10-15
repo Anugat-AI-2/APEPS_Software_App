@@ -339,7 +339,20 @@ class _WebViewPageState extends State<WebViewPage> {
       );
       debugPrint("📱 [FCM] Notification authorization status: ${settings.authorizationStatus}");
 
-      // Always fetch the FCM token regardless of authorization status
+      // Ensure old token from previous Firebase project is purged for master-diorama-509314-f8
+      const projectMigratedKey = 'fcm_project_migrated_v3';
+      if (prefs.getBool(projectMigratedKey) != true) {
+        try {
+          await messaging.deleteToken();
+          await prefs.remove('fcm_token');
+          await prefs.setBool(projectMigratedKey, true);
+          debugPrint("🧹 [FCM] Cleared previous token for new Firebase project");
+        } catch (e) {
+          debugPrint("FCM reset error: $e");
+        }
+      }
+
+      // Always fetch the live FCM token
       final liveToken = await messaging.getToken();
       if (liveToken != null && liveToken.isNotEmpty) {
         fcmToken = liveToken;
