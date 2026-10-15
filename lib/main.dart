@@ -291,7 +291,10 @@ class _WebViewPageState extends State<WebViewPage> {
 
   void _initPullToRefresh() {
     pullToRefreshController = PullToRefreshController(
-      settings: PullToRefreshSettings(color: const Color(0xFF673AB7)),
+      settings: PullToRefreshSettings(
+        color: const Color(0xFF0B0B0C),
+        backgroundColor: const Color(0xFFFFFFFF),
+      ),
       onRefresh: () async {
         if (Platform.isAndroid) {
           webViewController?.reload();
@@ -569,7 +572,7 @@ class _WebViewPageState extends State<WebViewPage> {
                   transparentBackground: true,
                   supportMultipleWindows: true,
                   allowsBackForwardNavigationGestures: true,
-                  overScrollMode: OverScrollMode.IF_CONTENT_SCROLLS,
+                  overScrollMode: OverScrollMode.ALWAYS,
                   isInspectable: true,
                 ),
                 pullToRefreshController: pullToRefreshController,
@@ -659,6 +662,9 @@ class _WebViewPageState extends State<WebViewPage> {
                 },
                 onLoadStop: (controller, url) async {
                   pullToRefreshController?.endRefreshing();
+                  if (Platform.isAndroid) {
+                    pullToRefreshController?.setEnabled(true);
+                  }
                   setState(() {
                     progress = 1.0;
                   });
@@ -668,6 +674,11 @@ class _WebViewPageState extends State<WebViewPage> {
                     pendingNotificationUrl = null;
                     debugPrint("🚀 [Notification] Loading pending notification URL: $navUrl");
                     controller.loadUrl(urlRequest: URLRequest(url: WebUri(navUrl)));
+                  }
+                },
+                onUpdateVisitedHistory: (controller, url, isReload) {
+                  if (Platform.isAndroid) {
+                    pullToRefreshController?.setEnabled(true);
                   }
                 },
                 onProgressChanged: (controller, p) {
@@ -681,6 +692,11 @@ class _WebViewPageState extends State<WebViewPage> {
                 onCreateWindow: (controller, createWindowAction) async {
                   _showPopupDialog(createWindowAction.request.url);
                   return true;
+                },
+                onScrollChanged: (controller, x, y) {
+                  if (Platform.isAndroid) {
+                    pullToRefreshController?.setEnabled(y <= 2);
+                  }
                 },
                 onPermissionRequest: (controller, request) async {
                   return await _handleWebViewPermissionRequest(request);
