@@ -4,7 +4,7 @@ class AppConfig {
   /// Toggle this to:
   /// - `true` to load the local development server (http://localhost:5177)
   /// - `false` to load production (https://hiralal-dev.anugatai.com)
-  static const bool useLocalUrl = true;
+  static const bool useLocalUrl = false;
 
   // ─────────────────────────────────────────────────────────────────────────────
   // URLs Configuration
